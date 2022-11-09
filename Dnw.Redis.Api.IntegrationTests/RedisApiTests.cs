@@ -24,13 +24,19 @@ public class RedisApiTests : IClassFixture<ApiFactory>
     public async Task GetAsync()
     {
         // Given
+        const string key = "aKey";
+        const string value = "aValue";
+        
         var api = _apiFactory.CreateClient();
-
+        
         // When
-        var actual = await api.GetAsync("/api/redis/key");
+        await api.PostAsync($"/api/redis/{key}/{value}", null);
+        var actual = await api.GetAsync($"/api/redis/{key}");
         
         // Then
         Assert.NotNull(actual);
+        var result = await actual.Content.ReadAsStringAsync();
+        Assert.Equal(value, result);
     }
 }
 

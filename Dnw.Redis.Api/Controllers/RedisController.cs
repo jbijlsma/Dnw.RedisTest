@@ -14,6 +14,12 @@ public class RedisController : ControllerBase
         _db = mux.GetDatabase();
     }
     
+    [HttpPost("{key}/{value}")]
+    public void Get(string key, string value)
+    {
+        _db.StringSet(new RedisKey(key), value);
+    }
+    
     [HttpGet("{key}")]
     public string Get(string key)
     {

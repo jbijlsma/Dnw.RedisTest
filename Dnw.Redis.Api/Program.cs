@@ -1,4 +1,3 @@
-using Dnw.Redis.Api;
 using JetBrains.Annotations;
 using StackExchange.Redis;
 
@@ -6,7 +5,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost"));
-builder.Services.AddHostedService<RedisDbInitializer>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
