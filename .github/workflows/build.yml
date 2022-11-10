@@ -12,7 +12,7 @@ jobs:
 
     steps:
        - name: Show Docker Info
-       - run: |
+         run: |
            docker context ls
            echo $DOCKER_HOST
 #      - uses: actions/checkout@v3
