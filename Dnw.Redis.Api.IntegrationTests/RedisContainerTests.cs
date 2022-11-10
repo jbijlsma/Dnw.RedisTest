@@ -8,7 +8,7 @@ namespace Dnw.Redis.Api.IntegrationTests;
 
 public class RedisContainerTests
 {
-    //[Fact]
+    [Fact]
     public async Task Get()
     {
         // Given

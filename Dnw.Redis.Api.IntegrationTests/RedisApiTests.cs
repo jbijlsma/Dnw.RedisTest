@@ -1,7 +1,6 @@
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Configurations;
 using DotNet.Testcontainers.Containers;
-using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,28 +50,13 @@ public class RedisApiTests
     }
 }
 
-[UsedImplicitly]
 public class ApiFactory : WebApplicationFactory<Program>
 {
-    private readonly string _connectionString;
-    // private  RedisTestcontainer? _redisContainer;
-    //
-    // public async Task InitializeAsync()
-    // {
-    //     var redisContainerBuilder = new TestcontainersBuilder<RedisTestcontainer>().WithDatabase(new RedisTestcontainerConfiguration());
-    //     _redisContainer = redisContainerBuilder.Build();
-    //     
-    //     await _redisContainer.StartAsync().ConfigureAwait(false);
-    // }
-    //
-    // public new async Task DisposeAsync()
-    // {
-    //     await _redisContainer!.StopAsync().ConfigureAwait(false);
-    // }
+    private readonly string _redisConnectionString;
 
-    public ApiFactory(string connectionString)
+    public ApiFactory(string redisConnectionString)
     {
-        _connectionString = connectionString;
+        _redisConnectionString = redisConnectionString;
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -81,7 +65,7 @@ public class ApiFactory : WebApplicationFactory<Program>
         {
             services.RemoveAll(typeof(IConnectionMultiplexer));
             services.AddSingleton<IConnectionMultiplexer>(
-                ConnectionMultiplexer.Connect(_connectionString));
+                ConnectionMultiplexer.Connect(_redisConnectionString));
         });
     }
 }
