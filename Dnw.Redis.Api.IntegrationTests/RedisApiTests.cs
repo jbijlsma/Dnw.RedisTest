@@ -59,6 +59,10 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         {
             redisContainerBuilder.WithDockerEndpoint(dockerHost);
         }
+        else
+        {
+            redisContainerBuilder.WithDockerEndpoint("unix:///var/run/docker.sock");
+        }
 
         _redisContainer = redisContainerBuilder.Build();
         
