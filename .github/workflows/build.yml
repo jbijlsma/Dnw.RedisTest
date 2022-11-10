@@ -15,14 +15,18 @@ jobs:
         run: |
           docker context ls
           echo $DOCKER_HOST
-      - uses: actions/checkout@v3
-      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: ${{ matrix.dotnet-version }}
-      - name: Install dependencies
-        run: dotnet restore
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
-      - name: Test
-        run: dotnet test --no-restore
+          docker ps
+          docker run -p 80:80 -d nginx
+          docker ps
+          curl http://localhost:80
+#      - uses: actions/checkout@v3
+#      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+#        uses: actions/setup-dotnet@v3
+#        with:
+#          dotnet-version: ${{ matrix.dotnet-version }}
+#      - name: Install dependencies
+#        run: dotnet restore
+#      - name: Build
+#        run: dotnet build --configuration Release --no-restore
+#      - name: Test
+#        run: dotnet test --no-restore
