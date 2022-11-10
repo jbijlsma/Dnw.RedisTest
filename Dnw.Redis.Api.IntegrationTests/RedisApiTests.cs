@@ -12,14 +12,12 @@ using Xunit.Abstractions;
 
 namespace Dnw.Redis.Api.IntegrationTests;
 
-public class RedisApiTests : IClassFixture<ApiFactory>
+public class RedisApiTests
 {
-    private readonly ApiFactory _apiFactory;
     private readonly ITestOutputHelper _testOutputHelper;
 
-    public RedisApiTests(ApiFactory apiFactory, ITestOutputHelper testOutputHelper)
+    public RedisApiTests(ITestOutputHelper testOutputHelper)
     {
-        _apiFactory = apiFactory;
         _testOutputHelper = testOutputHelper;
     }
     
@@ -32,7 +30,15 @@ public class RedisApiTests : IClassFixture<ApiFactory>
         
         _testOutputHelper.WriteLine($"DOCKER_HOST={Environment.GetEnvironmentVariable("DOCKER_HOST")}");
         
-        var api = _apiFactory.CreateClient();
+        var redisContainer = new TestcontainersBuilder<RedisTestcontainer>()
+            .WithDatabase(new RedisTestcontainerConfiguration())
+            .Build();
+
+        await redisContainer.StartAsync()
+            .ConfigureAwait(false);
+
+        var apiFactory = new ApiFactory(redisContainer.ConnectionString);
+        var api = apiFactory.CreateClient();
 
         // When
         await api.PostAsync($"/api/redis/{key}/{value}", null);
@@ -46,21 +52,27 @@ public class RedisApiTests : IClassFixture<ApiFactory>
 }
 
 [UsedImplicitly]
-public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
+public class ApiFactory : WebApplicationFactory<Program>
 {
-    private  RedisTestcontainer? _redisContainer;
+    private readonly string _connectionString;
+    // private  RedisTestcontainer? _redisContainer;
+    //
+    // public async Task InitializeAsync()
+    // {
+    //     var redisContainerBuilder = new TestcontainersBuilder<RedisTestcontainer>().WithDatabase(new RedisTestcontainerConfiguration());
+    //     _redisContainer = redisContainerBuilder.Build();
+    //     
+    //     await _redisContainer.StartAsync().ConfigureAwait(false);
+    // }
+    //
+    // public new async Task DisposeAsync()
+    // {
+    //     await _redisContainer!.StopAsync().ConfigureAwait(false);
+    // }
 
-    public async Task InitializeAsync()
+    public ApiFactory(string connectionString)
     {
-        var redisContainerBuilder = new TestcontainersBuilder<RedisTestcontainer>().WithDatabase(new RedisTestcontainerConfiguration());
-        _redisContainer = redisContainerBuilder.Build();
-        
-        await _redisContainer.StartAsync().ConfigureAwait(false);
-    }
-
-    public new async Task DisposeAsync()
-    {
-        await _redisContainer!.StopAsync().ConfigureAwait(false);
+        _connectionString = connectionString;
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -69,7 +81,7 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         {
             services.RemoveAll(typeof(IConnectionMultiplexer));
             services.AddSingleton<IConnectionMultiplexer>(
-                ConnectionMultiplexer.Connect(_redisContainer!.ConnectionString));
+                ConnectionMultiplexer.Connect(_connectionString));
         });
     }
 }
