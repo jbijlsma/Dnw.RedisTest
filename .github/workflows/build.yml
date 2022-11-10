@@ -13,7 +13,8 @@ jobs:
     steps:
       - name: Show Docker Info
         run: |
-           echo $DOCKER_HOST
+          docker context ls
+          echo $DOCKER_HOST
       - uses: actions/checkout@v3
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
         uses: actions/setup-dotnet@v3
