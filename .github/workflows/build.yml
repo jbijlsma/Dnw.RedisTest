@@ -18,6 +18,8 @@ jobs:
           docker ps
           docker run --name nginx-test -d nginx
           docker stop nginx-test
+          docker run --name redis-test -d redis:5.0.14
+          docker stop redis-test
           docker ps
       - uses: actions/checkout@v3
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
