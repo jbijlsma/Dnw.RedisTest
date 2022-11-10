@@ -23,7 +23,7 @@ public class RedisApiTests : IClassFixture<ApiFactory>
         _testOutputHelper = testOutputHelper;
     }
     
-    //[Fact]
+    [Fact]
     public async Task GetAsync()
     {
         // Given
@@ -53,17 +53,6 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     public async Task InitializeAsync()
     {
         var redisContainerBuilder = new TestcontainersBuilder<RedisTestcontainer>().WithDatabase(new RedisTestcontainerConfiguration());
-
-        var dockerHost = Environment.GetEnvironmentVariable("DOCKER_HOST");
-        if (!string.IsNullOrWhiteSpace(dockerHost))
-        {
-            redisContainerBuilder.WithDockerEndpoint(dockerHost);
-        }
-        else
-        {
-            redisContainerBuilder.WithDockerEndpoint("unix:///var/run/docker.sock");
-        }
-
         _redisContainer = redisContainerBuilder.Build();
         
         await _redisContainer.StartAsync().ConfigureAwait(false);
