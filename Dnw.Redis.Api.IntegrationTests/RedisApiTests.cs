@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using Xunit;
 
@@ -43,13 +44,21 @@ public class RedisApiTests : IClassFixture<ApiFactory>
 [UsedImplicitly]
 public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
+    private readonly ILogger<ApiFactory> _logger;
+
     private readonly RedisTestcontainer _redisContainer = new TestcontainersBuilder<RedisTestcontainer>()
         .WithDatabase(new RedisTestcontainerConfiguration())
         .WithDockerEndpoint(Environment.GetEnvironmentVariable("DOCKER_HOST"))
         .Build();
 
+    public ApiFactory(ILogger<ApiFactory> logger)
+    {
+        _logger = logger;
+    }
+    
     public async Task InitializeAsync()
     {
+        _logger.LogInformation("DOCKER_HOST={dockerHost}", Environment.GetEnvironmentVariable("DOCKER_HOST"));
         await _redisContainer.StartAsync().ConfigureAwait(false);
     }
 
@@ -60,6 +69,8 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        _logger.LogInformation("DOCKER_HOST={dockerHost}", Environment.GetEnvironmentVariable("DOCKER_HOST"));
+        
         builder.ConfigureServices(services =>
         {
             services.RemoveAll(typeof(IConnectionMultiplexer));
