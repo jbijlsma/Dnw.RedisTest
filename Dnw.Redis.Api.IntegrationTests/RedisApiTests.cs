@@ -45,6 +45,7 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private readonly RedisTestcontainer _redisContainer = new TestcontainersBuilder<RedisTestcontainer>()
         .WithDatabase(new RedisTestcontainerConfiguration())
+        .WithDockerEndpoint(Environment.GetEnvironmentVariable("DOCKER_HOST"))
         .Build();
 
     public async Task InitializeAsync()
