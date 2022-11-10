@@ -16,22 +16,17 @@ jobs:
           docker context ls
           echo $DOCKER_HOST
           docker ps
-          sudo apt install redis-tools
-          docker run -p 6379:6379 redis
+          docker run --name nginx-test -d nginx
+          docker stop nginx-test
           docker ps
-          redis-cli SET mykey "Hello"
-          redis-cli GET mykey
-#          docker run -p 80:80 -d nginx
-#          docker ps
-#          curl http://localhost:80
-#      - uses: actions/checkout@v3
-#      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
-#        uses: actions/setup-dotnet@v3
-#        with:
-#          dotnet-version: ${{ matrix.dotnet-version }}
-#      - name: Install dependencies
-#        run: dotnet restore
-#      - name: Build
-#        run: dotnet build --configuration Release --no-restore
-#      - name: Test
-#        run: dotnet test --no-restore
+      - uses: actions/checkout@v3
+      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Install dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+      - name: Test
+        run: dotnet test --no-restore
